@@ -1,0 +1,112 @@
+spring:
+  application:
+    name: futurehub-gs
+
+  # 🌍 i18n
+  messages:
+    basename: messages
+    fallback-to-system-locale: false
+    encoding: UTF-8
+  web:
+    locale: pt_BR
+    locale-resolver: accept_header
+
+  # 🧩 Datasource (H2 em arquivo em modo PostgreSQL)
+  datasource:
+    url: jdbc:h2:file:./data/fhdb;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;AUTO_SERVER=TRUE;DATABASE_TO_UPPER=false
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      # habilite o acesso remoto apenas se precisar abrir em outra máquina:
+      settings:
+        web-allow-others: false
+
+  # 🧾 JPA / Hibernate
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
+    show-sql: false
+    defer-datasource-initialization: true
+
+  # 🍃 MongoDB
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/futurehub
+
+  # ⚡ Cache (Caffeine) + métricas
+  cache:
+    type: caffeine
+    cache-names: [areas, missoesPorArea, ideias, rankings]
+    caffeine:
+      # 'recordStats' resolve os avisos de métricas dos caches
+      spec: maximumSize=500,expireAfterWrite=10m,recordStats
+
+  # 🎨 Thymeleaf (dev)
+  thymeleaf:
+    cache: false
+    check-template-location: false
+
+  # 🐇 RabbitMQ (usar container Docker em localhost:5672)
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+  # 🧠 Spring AI (OpenAI)
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY:changeme}
+      speech:
+        enabled: false
+
+  # 🔐 Usuário DEV (apenas desenvolvimento)
+  security:
+    user:
+      name: admin
+      password: 123456
+
+# 🌐 Porta da aplicação
+server:
+  port: 8081
+  error:
+    include-message: always
+
+# 🔎 Actuator em porta separada
+management:
+  server:
+    port: 8082
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when_authorized
+  health:
+    rabbit:
+      enabled: true   # health do RabbitMQ ATIVO
+
+# 📖 Springdoc (Swagger UI)
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+# 🪵 Logging útil em DEV (opcional)
+logging:
+  level:
+    org.springframework.web: INFO
+    org.hibernate.SQL: OFF
+    org.hibernate.orm.jdbc.bind: OFF

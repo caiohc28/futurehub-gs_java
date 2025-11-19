@@ -69,5 +69,5 @@ stages:
               azureSubscription: 'your-azure-subscription'
               appType: 'webAppLinux'
               appName: 'futurehub-app'
-              package: '$(Pipeline.Workspace)/drop/*.jar'
+              package: '$(System.DefaultWorkingDirectory)/**/*.jar'
               runtimeStack: 'JAVA|17-java17'

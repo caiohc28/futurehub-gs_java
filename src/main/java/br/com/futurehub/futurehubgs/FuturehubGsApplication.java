@@ -11,8 +11,8 @@ import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfigurat
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 /**
- * Classe principal da aplicação Spring Boot.
- * MongoDB agora é o repositório principal.
+ * Classe principal da aplicacao Spring Boot.
+ * MongoDB agora é o repositorio principal.
  * JPA/Postgres ficam desabilitados (apenas standby no pom).
  */
 @SpringBootApplication(exclude = {

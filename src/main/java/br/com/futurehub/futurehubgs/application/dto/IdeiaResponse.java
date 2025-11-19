@@ -3,12 +3,12 @@ package br.com.futurehub.futurehubgs.application.dto;
 import java.time.LocalDateTime;
 
 public record IdeiaResponse(
-        String id,
+        Long id,
         String titulo,
         String descricao,
-        String autorId,
+        Long autorId,
         String autorNome,
-        String missaoId,
+        Long missaoId,
         Double mediaNotas,
         Integer totalAvaliacoes,
         LocalDateTime createdAt

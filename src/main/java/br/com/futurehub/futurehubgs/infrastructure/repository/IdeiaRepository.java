@@ -1,21 +1,19 @@
 package br.com.futurehub.futurehubgs.infrastructure.repository;
 
 import br.com.futurehub.futurehubgs.domain.Ideia;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.jpa.repository.JpaRepository; // Adicionado
+import java.util.List;
+import java.util.Optional;
 
-public interface IdeiaRepository extends MongoRepository<Ideia, String> {
+// A interface estende JpaRepository e usa a chave primária Long
+public interface IdeiaRepository extends JpaRepository<Ideia, Long> {
 
-    Page<Ideia> findByAutorId(String autorId, Pageable pageable);
+    // Exemplo de Query Method que pode ser útil
+    Optional<Ideia> findByTitulo(String titulo);
 
-    Page<Ideia> findByTituloContainingIgnoreCase(String q, Pageable pageable);
+    // Encontrar todas as ideias de um autor (chave estrangeira)
+    List<Ideia> findAllByAutorId(Long autorId);
 
-    Page<Ideia> findByAutorIdAndTituloContainingIgnoreCase(
-            String autorId, String q, Pageable pageable
-    );
+    // Encontrar todas as ideias de uma missão (chave estrangeira)
+    List<Ideia> findAllByMissaoId(Long missaoId);
 }
-
-
-
-

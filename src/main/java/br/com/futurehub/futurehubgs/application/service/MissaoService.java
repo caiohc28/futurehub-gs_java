@@ -6,7 +6,9 @@ import org.springframework.data.domain.Pageable;
 
 public interface MissaoService {
 
-    MissaoResponse gerarMissaoPorArea(String areaId);
+    // ✅ areaId agora é Long
+    MissaoResponse gerarMissaoPorArea(Long areaId);
 
-    Page<MissaoResponse> listarPorArea(String areaId, Pageable pageable);
+    // ✅ areaId agora é Long
+    Page<MissaoResponse> listarPorArea(Long areaId, Pageable pageable);
 }

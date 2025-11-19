@@ -1,14 +1,12 @@
 package br.com.futurehub.futurehubgs.infrastructure.repository;
 
 import br.com.futurehub.futurehubgs.domain.Area;
-import org.springframework.data.mongodb.repository.MongoRepository;
-
+import org.springframework.data.jpa.repository.JpaRepository; // Adicionado
 import java.util.Optional;
 
-public interface AreaRepository extends MongoRepository<Area, String> {
+// A interface estende JpaRepository e usa a chave primária Long
+public interface AreaRepository extends JpaRepository<Area, Long> {
 
-    Optional<Area> findByNomeIgnoreCase(String nome);
+    // Exemplo de método que pode ser útil no contexto de "Area"
+    Optional<Area> findByNome(String nome);
 }
-
-
-

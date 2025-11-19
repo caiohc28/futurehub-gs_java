@@ -12,7 +12,7 @@ public class AvaliacaoEventPublisher {
 
     private final RabbitTemplate rabbitTemplate;
 
-    public void publishAvaliacao(String ideiaId, int nota) {
+    public void publishAvaliacao(Long ideiaId, int nota) {
         String payload = ideiaId + ";" + nota;
         rabbitTemplate.convertAndSend(AVALIACOES_QUEUE, payload);
     }

@@ -28,24 +28,29 @@ public class RankingServiceImpl implements RankingService {
 
     @Override
     @CacheEvict(value = "rankings", allEntries = true)
-    public void processarEventoAvaliacao(String ideiaId, int nota) {
+    // ✅ 1. Assinatura alterada para Long ideiaId
+    public void processarEventoAvaliacao(Long ideiaId, int nota) {
 
+        // ✅ 2. findById recebe Long
         Ideia ideia = ideiaRepo.findById(ideiaId)
                 .orElseThrow(() -> new IllegalArgumentException("Ideia não encontrada para ranking"));
 
-        String usuarioId = ideia.getAutorId();
+        // ✅ 3. ID do Autor é Long
+        Long usuarioId = ideia.getAutorId();
         if (usuarioId == null) {
             throw new IllegalArgumentException("Ideia sem autor não pode participar do ranking");
         }
 
+        // ✅ 4. findById recebe Long
         Usuario usuario = usuarioRepo.findById(usuarioId)
                 .orElseThrow(() -> new IllegalArgumentException("Autor não encontrado para ranking"));
 
-        String periodoAtual = YearMonth.now().toString(); // ex.: 2025-11
+        String periodoAtual = YearMonth.now().toString();
 
+        // ✅ 5. findByUsuarioIdAndPeriodo recebe Long
         Ranking ranking = rankingRepo.findByUsuarioIdAndPeriodo(usuarioId, periodoAtual)
                 .orElseGet(() -> Ranking.builder()
-                        .usuarioId(usuarioId)
+                        .usuarioId(usuarioId) // Long
                         .pontuacaoTotal(0)
                         .periodo(periodoAtual)
                         .build()
@@ -66,23 +71,26 @@ public class RankingServiceImpl implements RankingService {
                 ? YearMonth.now().toString()
                 : periodo;
 
+        // O nome do método é findByPeriodoOrderByPontuacaoTotalDesc (correto)
         List<Ranking> rankings = rankingRepo.findByPeriodoOrderByPontuacaoTotalDesc(p);
 
         List<RankingUsuarioResponse> resposta = new ArrayList<>();
         int posicao = 1;
 
         for (Ranking r : rankings) {
-            String usuarioId = r.getUsuarioId();
+            // ✅ 6. ID do Usuário é Long
+            Long usuarioId = r.getUsuarioId();
 
             String usuarioNome = null;
             if (usuarioId != null) {
+                // ✅ 7. findById recebe Long
                 usuarioNome = usuarioRepo.findById(usuarioId)
                         .map(Usuario::getNome)
                         .orElse(null);
             }
 
             resposta.add(new RankingUsuarioResponse(
-                    usuarioId,
+                    usuarioId, // Long
                     usuarioNome,
                     r.getPontuacaoTotal(),
                     r.getPeriodo(),
@@ -96,11 +104,3 @@ public class RankingServiceImpl implements RankingService {
         return resposta;
     }
 }
-
-
-
-
-
-
-
-

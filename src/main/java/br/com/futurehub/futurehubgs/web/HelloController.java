@@ -21,7 +21,3 @@ public class HelloController {
         return messageSource.getMessage("app.title", null, locale);
     }
 }
-
-
-
-

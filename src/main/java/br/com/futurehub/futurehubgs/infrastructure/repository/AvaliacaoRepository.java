@@ -1,14 +1,11 @@
 package br.com.futurehub.futurehubgs.infrastructure.repository;
 
 import br.com.futurehub.futurehubgs.domain.Avaliacao;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.jpa.repository.JpaRepository; // Adicionado
 
-import java.util.List;
+// A interface estende JpaRepository e usa a chave primária Long
+public interface AvaliacaoRepository extends JpaRepository<Avaliacao, Long> {
 
-public interface AvaliacaoRepository extends MongoRepository<Avaliacao, String> {
-
-    List<Avaliacao> findByIdeiaId(String ideiaId);
+    // Exemplo de Query Method que pode ser útil
+    // List<Avaliacao> findAllByIdeiaId(String ideiaId);
 }
-
-
-

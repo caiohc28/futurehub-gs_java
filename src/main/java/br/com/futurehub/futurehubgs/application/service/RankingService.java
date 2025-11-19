@@ -5,7 +5,9 @@ import java.util.List;
 
 public interface RankingService {
 
-    void processarEventoAvaliacao(String ideiaId, int nota);
+    // ✅ ideiaId agora é Long
+    void processarEventoAvaliacao(Long ideiaId, int nota);
 
+    // O período continua sendo String, pois é uma data formatada.
     List<RankingUsuarioResponse> listarPorPeriodo(String periodo);
 }

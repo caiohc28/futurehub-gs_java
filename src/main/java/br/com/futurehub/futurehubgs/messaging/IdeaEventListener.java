@@ -11,7 +11,7 @@ import static br.com.futurehub.futurehubgs.config.RabbitConfig.IDEAS_QUEUE;
 public class IdeaEventListener {
 
     @RabbitListener(queues = IDEAS_QUEUE)
-    public void onMessage(String payload) {
+    public void onMessage(Long payload) {
         log.info("Evento recebido da fila de ideias: {}", payload);
     }
 }

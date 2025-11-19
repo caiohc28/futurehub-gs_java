@@ -18,12 +18,9 @@ public class RankingController {
     @GetMapping
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public List<RankingUsuarioResponse> listar(
-            @RequestParam(required = false) String periodo
+            @RequestParam(required = false) String periodo // Período continua sendo String
     ) {
+        // A lógica de busca e os IDs (Longs) são tratados dentro do Serviço.
         return rankingService.listarPorPeriodo(periodo);
     }
 }
-
-
-
-

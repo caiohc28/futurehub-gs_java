@@ -20,12 +20,8 @@ public class AvaliacaoController {
     public ResponseEntity<Void> avaliar(
             @Valid @RequestBody AvaliacaoCreateRequest req
     ) {
+        // O serviço espera que req.idIdeia() seja um Long.
         service.avaliar(req);
         return ResponseEntity.noContent().build();
     }
 }
-
-
-
-
-

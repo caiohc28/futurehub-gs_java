@@ -21,18 +21,28 @@ public class AvaliacaoEventListener {
 
     @RabbitListener(queues = AVALIACOES_QUEUE)
     public void onMessage(String payload) {
+        // Agora o produtor do evento (IdeaEventPublisher) deve garantir que
+        // o payload seja enviado no formato: "ID_LONGO;NOTA"
         try {
             String[] parts = payload.split(";");
-            String ideiaId = parts[0];
+
+            // ✅ CORREÇÃO 1: O ID ainda vem como String no payload, mas será convertido para Long
+            String ideiaIdString = parts[0];
+
+            // ✅ CORREÇÃO 2: Conversão explícita para Long para alinhar com o Serviço
+            Long ideiaId = Long.parseLong(ideiaIdString);
+
             int nota = Integer.parseInt(parts[1]);
 
             log.info("Evento de avaliação recebido: ideiaId={}, nota={}", ideiaId, nota);
+
+            // ✅ CORREÇÃO 3: O serviço processarEventoAvaliacao agora recebe Long
             rankingService.processarEventoAvaliacao(ideiaId, nota);
+
+        } catch (NumberFormatException e) {
+            log.error("Erro de formato! O ID da ideia ou a nota não são numéricos. Payload: {}", payload, e);
         } catch (Exception e) {
             log.error("Erro ao processar evento de avaliação. Payload: {}", payload, e);
         }
     }
 }
-
-
-

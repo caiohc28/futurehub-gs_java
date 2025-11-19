@@ -3,11 +3,11 @@ package br.com.futurehub.futurehubgs.application.dto;
 import java.time.LocalDateTime;
 
 public record MissaoResponse(
-        String id,
+        Long id,
         String descricao,
         String objetivo,
         String moral,
-        String areaId,
+        Long areaId,
         String areaNome,
         boolean geradaPorIa,
         LocalDateTime dataCriacao

@@ -30,6 +30,7 @@ public class IdeiaController {
     ) {
         var resp = service.criar(req);
 
+        // ✅ CORREÇÃO 1: O ID da resposta (resp.id()) é Long, o buildAndExpand trata isso.
         var location = uri.path("/api/ideias/{id}")
                 .buildAndExpand(resp.id())
                 .toUri();
@@ -39,7 +40,7 @@ public class IdeiaController {
 
     @GetMapping
     public Page<IdeiaResponse> listar(
-            @RequestParam(required = false) String areaId,
+            @RequestParam(required = false) Long areaId, // ⚠️ ATENÇÃO: Se Area.id foi Long, este deve ser Long.
             @RequestParam(required = false) String q,
             @PageableDefault(
                     size = 20,
@@ -47,30 +48,29 @@ public class IdeiaController {
                     direction = Sort.Direction.DESC
             ) Pageable pageable
     ) {
+        // A camada de serviço lida com a lógica de filtragem interna.
         return service.listar(areaId, q, pageable);
     }
 
     @GetMapping("/{id}")
-    public IdeiaResponse buscar(@PathVariable String id) {
+    // ✅ CORREÇÃO 2: Mudar o tipo de String para Long no @PathVariable
+    public IdeiaResponse buscar(@PathVariable Long id) {
         return service.buscar(id);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public IdeiaResponse atualizar(@PathVariable String id,
+    // ✅ CORREÇÃO 3: Mudar o tipo de String para Long no @PathVariable
+    public IdeiaResponse atualizar(@PathVariable Long id,
                                    @Valid @RequestBody IdeiaUpdateRequest req) {
         return service.atualizar(id, req);
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> deletar(@PathVariable String id) {
+    // ✅ CORREÇÃO 4: Mudar o tipo de String para Long no @PathVariable
+    public ResponseEntity<Void> deletar(@PathVariable Long id) {
         service.deletar(id);
         return ResponseEntity.noContent().build();
     }
 }
-
-
-
-
-

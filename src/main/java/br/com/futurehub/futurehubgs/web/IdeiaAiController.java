@@ -22,7 +22,8 @@ public class IdeiaAiController {
     @PostMapping("/gerar")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<MissaoResponse> gerarMissao(
-            @RequestParam String areaId,
+            // ✅ CORREÇÃO 1: Removendo o negrito
+            @RequestParam Long areaId,
             UriComponentsBuilder uriBuilder
     ) {
         var resp = missaoService.gerarMissaoPorArea(areaId);
@@ -36,14 +37,11 @@ public class IdeiaAiController {
 
     @GetMapping
     public Page<MissaoResponse> listarPorArea(
-            @RequestParam(required = false) String areaId,
+            // ✅ CORREÇÃO 2: Removendo o negrito
+            @RequestParam(required = false) Long areaId,
             @PageableDefault(size = 10, sort = "dataCriacao", direction = Sort.Direction.DESC)
             Pageable pageable
     ) {
         return missaoService.listarPorArea(areaId, pageable);
     }
 }
-
-
-
-

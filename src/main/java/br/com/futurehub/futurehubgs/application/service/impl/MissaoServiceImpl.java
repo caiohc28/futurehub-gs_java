@@ -28,6 +28,7 @@ public class MissaoServiceImpl implements MissaoService {
 
         String areaNome = null;
         if (m.getAreaId() != null) {
+            // ✅ findById recebe Long
             areaNome = areaRepo.findById(m.getAreaId())
                     .map(Area::getNome)
                     .orElse(null);
@@ -38,11 +39,11 @@ public class MissaoServiceImpl implements MissaoService {
                 : m.getCreatedAt();
 
         return new MissaoResponse(
-                m.getId(),
+                m.getId(), // Long
                 m.getDescricao(),
                 m.getObjetivo(),
                 m.getMoral(),
-                m.getAreaId(),
+                m.getAreaId(), // Long
                 areaNome,
                 m.isGeradaPorIa(),
                 dataCriacao
@@ -51,8 +52,10 @@ public class MissaoServiceImpl implements MissaoService {
 
     @Override
     @CacheEvict(value = "missoesPorArea", allEntries = true)
-    public MissaoResponse gerarMissaoPorArea(String areaId) {
+    // ✅ Assinatura alterada para Long areaId
+    public MissaoResponse gerarMissaoPorArea(Long areaId) {
 
+        // ✅ findById recebe Long
         var area = areaRepo.findById(areaId)
                 .orElseThrow(() -> new IllegalArgumentException("erro.area.nao.encontrada"));
 
@@ -93,7 +96,7 @@ public class MissaoServiceImpl implements MissaoService {
                 .descricao(descricao)
                 .objetivo(objetivo)
                 .moral(moral)
-                .areaId(area.getId())
+                .areaId(area.getId()) // Long
                 .dataCriacao(LocalDateTime.now())
                 .status("ATIVA")
                 .geradaPorIa(true)
@@ -109,11 +112,14 @@ public class MissaoServiceImpl implements MissaoService {
             value = "missoesPorArea",
             key = "#areaId + '-' + #pageable.pageNumber + '-' + #pageable.pageSize + '-' + #pageable.sort"
     )
-    public Page<MissaoResponse> listarPorArea(String areaId, Pageable pageable) {
+    // ✅ Assinatura alterada para Long areaId
+    public Page<MissaoResponse> listarPorArea(Long areaId, Pageable pageable) {
 
         Page<Missao> page;
 
-        if (areaId != null && !areaId.isBlank()) {
+        // ✅ Lógica de checagem para Long
+        if (areaId != null) {
+            // ✅ findByAreaId deve receber Long
             page = missaoRepo.findByAreaId(areaId, pageable);
         } else {
             page = missaoRepo.findAll(pageable);
@@ -122,9 +128,3 @@ public class MissaoServiceImpl implements MissaoService {
         return page.map(this::toResponse);
     }
 }
-
-
-
-
-
-

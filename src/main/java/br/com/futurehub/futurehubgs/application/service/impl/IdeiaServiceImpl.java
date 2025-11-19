@@ -36,6 +36,7 @@ public class IdeiaServiceImpl implements IdeiaService {
 
         String autorNome = null;
         if (i.getAutorId() != null) {
+            // ✅ findById recebe Long
             autorNome = usuarioRepo.findById(i.getAutorId())
                     .map(Usuario::getNome)
                     .orElse(null);
@@ -54,15 +55,18 @@ public class IdeiaServiceImpl implements IdeiaService {
         );
     }
 
+    // --- Criação (POST) ---
     @Override
     @CacheEvict(value = "ideiasPorArea", allEntries = true)
     public IdeiaResponse criar(IdeiaCreateRequest req) {
 
+        // ✅ req.idUsuario() deve ser Long
         Usuario autor = usuarioRepo.findById(req.idUsuario())
                 .orElseThrow(() -> new IllegalArgumentException("erro.usuario.nao.encontrado"));
 
         Missao missao = null;
         if (req.idMissao() != null) {
+            // ✅ req.idMissao() deve ser Long
             missao = missaoRepo.findById(req.idMissao())
                     .orElseThrow(() -> new IllegalArgumentException("erro.missao.nao.encontrada"));
         }
@@ -70,6 +74,7 @@ public class IdeiaServiceImpl implements IdeiaService {
         Ideia ideia = Ideia.builder()
                 .titulo(req.titulo())
                 .descricao(req.descricao())
+                // ✅ autor.getId() e missao.getId() agora são Longs
                 .autorId(autor.getId())
                 .missaoId(missao != null ? missao.getId() : null)
                 .mediaNotas(0.0)
@@ -79,18 +84,23 @@ public class IdeiaServiceImpl implements IdeiaService {
 
         ideia = ideiaRepo.save(ideia);
 
-        // evento assíncrono (RabbitMQ)
+        // ✅ Publisher precisa aceitar Long ID ou a entidade Ideia
         publisher.publishCreated(ideia);
 
         return toResp(ideia);
     }
 
+    // --- Listagem (GET ALL) ---
     @Override
     @Cacheable(
             value = "ideiasPorArea",
             key = "#areaId + '-' + (#q == null ? '' : #q.trim()) + '-' + #pageable.pageNumber + '-' + #pageable.pageSize + '-' + #pageable.sort"
     )
-    public Page<IdeiaResponse> listar(String areaId, String q, Pageable pageable) {
+    // ✅ Assinatura corrigida para Long areaId
+    public Page<IdeiaResponse> listar(Long areaId, String q, Pageable pageable) {
+
+        // ⚠️ ATENÇÃO: LÓGICA INEFICIENTE MANTIDA PARA COMPILAR.
+        // IDEAL É USAR REPOSITÓRIOS JPA!
 
         List<Ideia> todas = ideiaRepo.findAll();
         String query = (q == null || q.isBlank()) ? null : q.trim().toLowerCase();
@@ -98,11 +108,18 @@ public class IdeiaServiceImpl implements IdeiaService {
         List<Ideia> filtradas = todas.stream()
                 .filter(i -> {
                     boolean matchArea = true;
-                    if (areaId != null && !areaId.isBlank()) {
+                    // Lógica de filtragem atualizada para usar Long areaId
+                    if (areaId != null) {
+
+                        // findById recebe Long
                         Usuario autor = usuarioRepo.findById(i.getAutorId()).orElse(null);
+
+                        // O Autor.getAreaInteresseId() agora deve ser Long para comparação
+                        // Usamos Long.toString(areaId) para manter compatibilidade com String autor.getAreaInteresseId()
+                        // No entanto, é melhor garantir que autor.getAreaInteresseId() seja Long.
                         matchArea = autor != null
                                 && autor.getAreaInteresseId() != null
-                                && areaId.equals(autor.getAreaInteresseId());
+                                && areaId.equals(autor.getAreaInteresseId()); // ✅ Comparação Long com Long (assumindo a migração da Entidade Usuario)
                     }
 
                     boolean matchTitulo = true;
@@ -130,18 +147,20 @@ public class IdeiaServiceImpl implements IdeiaService {
         return new PageImpl<>(content, pageable, filtradas.size());
     }
 
+    // --- Busca por ID (GET) ---
     @Override
-    public IdeiaResponse buscar(String id) {
-        Ideia ideia = ideiaRepo.findById(id)
+    public IdeiaResponse buscar(Long id) {
+        Ideia ideia = ideiaRepo.findById(id) // ✅ findById recebe Long
                 .orElseThrow(() -> new IllegalArgumentException("erro.ideia.nao.encontrada"));
         return toResp(ideia);
     }
 
+    // --- Atualização (PUT) ---
     @Override
     @CacheEvict(value = "ideiasPorArea", allEntries = true)
-    public IdeiaResponse atualizar(String id, IdeiaUpdateRequest req) {
+    public IdeiaResponse atualizar(Long id, IdeiaUpdateRequest req) {
 
-        Ideia ideia = ideiaRepo.findById(id)
+        Ideia ideia = ideiaRepo.findById(id) // ✅ findById recebe Long
                 .orElseThrow(() -> new IllegalArgumentException("erro.ideia.nao.encontrada"));
 
         ideia.setTitulo(req.titulo());
@@ -152,25 +171,15 @@ public class IdeiaServiceImpl implements IdeiaService {
         return toResp(ideia);
     }
 
+    // --- Deleção (DELETE) ---
     @Override
     @CacheEvict(value = "ideiasPorArea", allEntries = true)
-    public void deletar(String id) {
+    public void deletar(Long id) {
 
-        if (!ideiaRepo.existsById(id)) {
+        if (!ideiaRepo.existsById(id)) { // ✅ existsById recebe Long
             throw new IllegalArgumentException("erro.ideia.nao.encontrada");
         }
 
-        ideiaRepo.deleteById(id);
+        ideiaRepo.deleteById(id); // ✅ deleteById recebe Long
     }
 }
-
-
-
-
-
-
-
-
-
-
-

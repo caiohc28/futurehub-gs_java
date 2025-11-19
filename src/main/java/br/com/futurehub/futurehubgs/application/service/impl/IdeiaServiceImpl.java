@@ -10,7 +10,7 @@ import br.com.futurehub.futurehubgs.domain.Usuario;
 import br.com.futurehub.futurehubgs.infrastructure.repository.IdeiaRepository;
 import br.com.futurehub.futurehubgs.infrastructure.repository.MissaoRepository;
 import br.com.futurehub.futurehubgs.infrastructure.repository.UsuarioRepository;
-import br.com.futurehub.futurehubgs.messaging.IdeaEventPublisher;
+// import br.com.futurehub.futurehubgs.messaging.IdeaEventPublisher; // REMOVIDO
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -30,13 +30,13 @@ public class IdeiaServiceImpl implements IdeiaService {
     private final IdeiaRepository ideiaRepo;
     private final UsuarioRepository usuarioRepo;
     private final MissaoRepository missaoRepo;
-    private final IdeaEventPublisher publisher;
+    // private final IdeaEventPublisher publisher; // REMOVIDO
 
     private IdeiaResponse toResp(Ideia i) {
 
         String autorNome = null;
         if (i.getAutorId() != null) {
-            // ✅ findById recebe Long
+            // findById recebe Long
             autorNome = usuarioRepo.findById(i.getAutorId())
                     .map(Usuario::getNome)
                     .orElse(null);
@@ -60,13 +60,13 @@ public class IdeiaServiceImpl implements IdeiaService {
     @CacheEvict(value = "ideiasPorArea", allEntries = true)
     public IdeiaResponse criar(IdeiaCreateRequest req) {
 
-        // ✅ req.idUsuario() deve ser Long
+        // req.idUsuario() deve ser Long
         Usuario autor = usuarioRepo.findById(req.idUsuario())
                 .orElseThrow(() -> new IllegalArgumentException("erro.usuario.nao.encontrado"));
 
         Missao missao = null;
         if (req.idMissao() != null) {
-            // ✅ req.idMissao() deve ser Long
+            // req.idMissao() deve ser Long
             missao = missaoRepo.findById(req.idMissao())
                     .orElseThrow(() -> new IllegalArgumentException("erro.missao.nao.encontrada"));
         }
@@ -74,7 +74,7 @@ public class IdeiaServiceImpl implements IdeiaService {
         Ideia ideia = Ideia.builder()
                 .titulo(req.titulo())
                 .descricao(req.descricao())
-                // ✅ autor.getId() e missao.getId() agora são Longs
+                // autor.getId() e missao.getId() agora são Longs
                 .autorId(autor.getId())
                 .missaoId(missao != null ? missao.getId() : null)
                 .mediaNotas(0.0)
@@ -84,8 +84,7 @@ public class IdeiaServiceImpl implements IdeiaService {
 
         ideia = ideiaRepo.save(ideia);
 
-        // ✅ Publisher precisa aceitar Long ID ou a entidade Ideia
-        publisher.publishCreated(ideia);
+        // REMOVIDO: publisher.publishCreated(ideia);
 
         return toResp(ideia);
     }
@@ -96,7 +95,7 @@ public class IdeiaServiceImpl implements IdeiaService {
             value = "ideiasPorArea",
             key = "#areaId + '-' + (#q == null ? '' : #q.trim()) + '-' + #pageable.pageNumber + '-' + #pageable.pageSize + '-' + #pageable.sort"
     )
-    // ✅ Assinatura corrigida para Long areaId
+    // Assinatura corrigida para Long areaId
     public Page<IdeiaResponse> listar(Long areaId, String q, Pageable pageable) {
 
         // ⚠️ ATENÇÃO: LÓGICA INEFICIENTE MANTIDA PARA COMPILAR.
@@ -115,11 +114,9 @@ public class IdeiaServiceImpl implements IdeiaService {
                         Usuario autor = usuarioRepo.findById(i.getAutorId()).orElse(null);
 
                         // O Autor.getAreaInteresseId() agora deve ser Long para comparação
-                        // Usamos Long.toString(areaId) para manter compatibilidade com String autor.getAreaInteresseId()
-                        // No entanto, é melhor garantir que autor.getAreaInteresseId() seja Long.
                         matchArea = autor != null
                                 && autor.getAreaInteresseId() != null
-                                && areaId.equals(autor.getAreaInteresseId()); // ✅ Comparação Long com Long (assumindo a migração da Entidade Usuario)
+                                && areaId.equals(autor.getAreaInteresseId()); // Comparação Long com Long (assumindo a migração da Entidade Usuario)
                     }
 
                     boolean matchTitulo = true;
@@ -150,7 +147,7 @@ public class IdeiaServiceImpl implements IdeiaService {
     // --- Busca por ID (GET) ---
     @Override
     public IdeiaResponse buscar(Long id) {
-        Ideia ideia = ideiaRepo.findById(id) // ✅ findById recebe Long
+        Ideia ideia = ideiaRepo.findById(id) // findById recebe Long
                 .orElseThrow(() -> new IllegalArgumentException("erro.ideia.nao.encontrada"));
         return toResp(ideia);
     }
@@ -160,7 +157,7 @@ public class IdeiaServiceImpl implements IdeiaService {
     @CacheEvict(value = "ideiasPorArea", allEntries = true)
     public IdeiaResponse atualizar(Long id, IdeiaUpdateRequest req) {
 
-        Ideia ideia = ideiaRepo.findById(id) // ✅ findById recebe Long
+        Ideia ideia = ideiaRepo.findById(id) // findById recebe Long
                 .orElseThrow(() -> new IllegalArgumentException("erro.ideia.nao.encontrada"));
 
         ideia.setTitulo(req.titulo());
@@ -176,10 +173,10 @@ public class IdeiaServiceImpl implements IdeiaService {
     @CacheEvict(value = "ideiasPorArea", allEntries = true)
     public void deletar(Long id) {
 
-        if (!ideiaRepo.existsById(id)) { // ✅ existsById recebe Long
+        if (!ideiaRepo.existsById(id)) { // existsById recebe Long
             throw new IllegalArgumentException("erro.ideia.nao.encontrada");
         }
 
-        ideiaRepo.deleteById(id); // ✅ deleteById recebe Long
+        ideiaRepo.deleteById(id); // deleteById recebe Long
     }
 }

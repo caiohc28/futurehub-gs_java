@@ -28,11 +28,11 @@ public class Ideia {
 
     // --- Chaves Estrangeiras (Simples) ---
     // Usamos Long assumindo que Usuario migrou para Long ID
-    @Column(name = "autor_id", nullable = false)
+    @Column(name = "id_usuario", nullable = false)
     private Long autorId;
 
     // Usamos Long assumindo que Missao migrou para Long ID
-    @Column(name = "missao_id", nullable = false)
+    @Column(name = "id_missao", nullable = false)
     private Long missaoId;
 
     // --- Campos de Cálculo/Estatísticas ---

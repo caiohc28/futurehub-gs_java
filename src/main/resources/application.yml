@@ -11,17 +11,23 @@ spring:
     locale: pt_BR
     locale-resolver: accept_header
 
-# 🗄️ Azure SQL Database Configuration
-# Correção na sintaxe da URL do driver
+  # 🗄️ Azure SQL Database Configuration
   datasource:
-    # Use o formato canônico: //host:porta;propriedade=valor
-    url: jdbc:sqlserver://dbfuturehub.database.windows.net:1433;databaseName=dbfuturehub;
+    url: jdbc:sqlserver://dbfuturehub.database.windows.net:1433;databaseName=dbfuturehub;encrypt=true;trustServerCertificate=false;loginTimeout=30;
     username: admin_fiap
     password: Macacoprego@
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  # 🔧 JPA/Hibernate Configuration
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
         implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
@@ -54,18 +60,6 @@ spring:
     mode: HTML
     encoding: UTF-8
 
-  # 🐇 RabbitMQ
-  rabbitmq:
-    host: ${RABBITMQ_HOST:localhost}
-    port: ${RABBITMQ_PORT:5672}
-    username: ${RABBITMQ_USERNAME:guest}
-    password: ${RABBITMQ_PASSWORD:guest}
-    listener:
-      simple:
-        acknowledge-mode: auto
-        concurrency: 3
-        max-concurrency: 10
-
   # 🧠 Spring AI
   ai:
     openai:
@@ -85,14 +79,14 @@ server:
     mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json
     min-response-size: 1024
 
-# 🔎 Actuator em porta separada
+# 🔎 Actuator - SIMPLIFICADO
 management:
   server:
     port: ${MANAGEMENT_PORT:8082}
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,env,loggers
+        include: health,info,metrics
       base-path: /actuator
   endpoint:
     health:
@@ -116,7 +110,6 @@ springdoc:
     operations-sorter: alpha
     display-request-duration: true
     doc-expansion: none
-  show-actuator: true
 
 # 📊 Logging
 logging:
